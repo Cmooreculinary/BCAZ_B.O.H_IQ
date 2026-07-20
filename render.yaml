@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: bcaz-boh-iq-api
+    runtime: python
+    plan: free
+    region: virginia
+    rootDir: apps/api
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: APP_ENV
+        value: production
+      - key: APP_STORAGE
+        value: mongo
+      - key: MONGODB_DATABASE
+        value: bcaz_boh_iq
+      - key: ACCESS_TOKEN_MINUTES
+        value: "480"
+      - key: SEED_DEMO_DATA
+        value: "true"
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: MONGODB_URI
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: BOOTSTRAP_ADMIN_EMAIL
+        value: owner@bcaz.example
+      - key: BOOTSTRAP_ADMIN_PASSWORD
+        sync: false
+
