@@ -8,7 +8,7 @@ Create **New → Web Service**, select `Cmooreculinary/BCAZ_B.O.H_IQ`, and use:
 | --- | --- |
 | Name | `bcaz-boh-iq-api` |
 | Region | `Virginia` |
-| Branch | `feature/bcaz-boh-global-iq` |
+| Branch | `main` |
 | Root Directory | `apps/api` |
 | Language | `Python 3` |
 | Build Command | `pip install -r requirements.txt` |
@@ -27,7 +27,7 @@ Required environment variables:
 | `MONGODB_DATABASE` | `bcaz_boh_iq` |
 | `AUTH_SECRET` | Random secret with at least 32 characters |
 | `CORS_ORIGINS` | Exact production origin displayed by Vercel |
-| `BOOTSTRAP_ADMIN_EMAIL` | `owner@bcaz.example` or the approved administrator email |
+| `BOOTSTRAP_ADMIN_EMAIL` | Approved administrator email entered during Blueprint creation |
 | `BOOTSTRAP_ADMIN_PASSWORD` | Unique password with at least 12 characters |
 | `SEED_DEMO_DATA` | `true` for the controlled beta dataset |
 | `ACCESS_TOKEN_MINUTES` | `480` |
@@ -42,7 +42,7 @@ Import the same repository into Vercel and use:
 
 | Vercel field | Exact value |
 | --- | --- |
-| Branch | `feature/bcaz-boh-global-iq` |
+| Branch | `main` |
 | Root Directory | `apps/web` |
 | Framework Preset | `Vite` |
 | Install Command | `npm ci` |
