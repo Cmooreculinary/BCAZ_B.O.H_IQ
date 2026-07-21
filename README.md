@@ -70,4 +70,19 @@ npm run build
 
 The API deploys as a Render Web Service from `apps/api`. The frontend deploys separately on Vercel from `apps/web`. Exact fields and required environment variables are in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
+### Render Blueprint
+
+The root [`render.yaml`](render.yaml) is the deployment recipe for the API. It tells Render which branch and directory to use, how to install and start the FastAPI service, which health check to monitor, and which configuration values are required. Keeping this configuration in GitHub makes the deployment repeatable and reviewable.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Cmooreculinary/BCAZ_B.O.H_IQ)
+
+During Blueprint deployment, Render requests these private values:
+
+- `MONGODB_URI`: the MongoDB Atlas connection string
+- `CORS_ORIGINS`: `http://localhost:5173` temporarily, then the exact Vercel production origin
+- `BOOTSTRAP_ADMIN_EMAIL`: the approved administrator email
+- `BOOTSTRAP_ADMIN_PASSWORD`: a unique password containing at least 12 characters
+
+Do not paste those secrets into GitHub or chat. Nothing becomes live until an authorized user reviews the Blueprint, supplies the private values in Render, and clicks **Deploy Blueprint**. The Blueprint deploys the API only; the Vercel frontend is a separate deployment.
+
 Never commit production credentials. Never use wildcard CORS. Allergen information is operational support only and never a safety guarantee.
