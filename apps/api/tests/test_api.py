@@ -198,3 +198,40 @@ def test_import_validation_audit_logging_and_global_iq_evidence_links():
         answer = client.post("/api/v1/global-iq/query", headers=auth_header(token), json={"question": "Why did food cost rise this week?"})
         assert answer.status_code == 200
         assert answer.json()["data"]["citations"][0]["domain"] in {"invoices", "receiving", "analytics"}
+
+
+def test_global_iq_agents_endpoint_lists_the_ecosystem():
+    with TestClient(app) as client:
+        token = login(client)
+        agents = client.get("/api/v1/global-iq/agents", headers=auth_header(token))
+        assert agents.status_code == 200
+        agent_names = {agent["name"] for agent in agents.json()["data"]}
+        assert agent_names == {"receiving-agent", "invoice-agent", "inventory-agent", "recipe-agent"}
+
+
+def test_global_iq_query_response_identifies_which_agent_answered():
+    with TestClient(app) as client:
+        token = login(client)
+        answer = client.post(
+            "/api/v1/global-iq/query",
+            headers=auth_header(token),
+            json={"question": "Why did food cost rise this week?"},
+        )
+        assert answer.status_code == 200
+        data = answer.json()["data"]
+        assert data["agent"] in {"receiving-agent", "invoice-agent", "inventory-agent", "archive-lookup"}
+
+
+def test_global_iq_falls_back_when_no_agent_has_evidence():
+    with TestClient(app) as client:
+        token = login(client, "owner@other.example")
+        answer = client.post(
+            "/api/v1/global-iq/query",
+            headers=auth_header(token),
+            json={"question": "What is our current staff schedule?"},
+        )
+        assert answer.status_code == 200
+        data = answer.json()["data"]
+        assert data["agent"] is None
+        assert data["evidence_complete"] is False
+        assert data["citations"] == []

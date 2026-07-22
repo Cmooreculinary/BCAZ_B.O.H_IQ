@@ -156,6 +156,7 @@ h1, h2 { font-family: "Bebas Neue", Impact, sans-serif; font-weight: 400; letter
 .citation-row { display: flex; flex-wrap: wrap; gap: 7px; }
 .citation-row span, .citation-row b { padding: 5px 7px; background: var(--surface-2); color: #929292; font: 9px/1 "IBM Plex Mono", monospace; }
 .citation-row b { color: var(--good); }
+.iq-agent-tag { color: var(--fire) !important; border: 1px solid var(--fire); background: transparent !important; }
 
 .table-wrap { width: 100%; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
