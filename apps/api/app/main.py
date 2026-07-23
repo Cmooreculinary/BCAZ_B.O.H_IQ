@@ -14,6 +14,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from . import calculations
+from .agents import AGENTS, answer_question
 from .config import settings
 from .models import (
     CreateRecordRequest,
@@ -406,12 +407,36 @@ async def import_preview(
     )
 
 
+@app.get("/api/v1/global-iq/agents")
+async def global_iq_agents(
+    request: Request,
+    user: Annotated[dict, Depends(current_session)],
+):
+    return envelope(
+        [{"name": agent.name, "description": agent.description} for agent in AGENTS],
+        request,
+    )
+
+
 @app.post("/api/v1/global-iq/query")
 async def global_iq(
     payload: GlobalIQRequest,
     request: Request,
     user: Annotated[dict, Depends(current_session)],
 ):
+    live_answer = await answer_question(payload.question, repository, tenant_filters(user))
+    if live_answer:
+        return envelope(
+            {
+                "answer": live_answer.answer,
+                "confidence": live_answer.confidence,
+                "citations": live_answer.citations,
+                "evidence_complete": live_answer.evidence_complete,
+                "agent": live_answer.agent,
+            },
+            request,
+        )
+
     answers, _ = await repository.list("global-iq", tenant_filters(user), limit=20)
     selected = next(
         (item for item in answers if item.get("question", "").lower() == payload.question.lower()),
@@ -424,6 +449,7 @@ async def global_iq(
                 "confidence": "0.00",
                 "citations": [],
                 "evidence_complete": False,
+                "agent": None,
             },
             request,
         )
@@ -433,6 +459,7 @@ async def global_iq(
             "confidence": selected.get("confidence", "0.00"),
             "citations": selected.get("citations", []),
             "evidence_complete": selected.get("evidence_complete", False),
+            "agent": "archive-lookup",
         },
         request,
     )

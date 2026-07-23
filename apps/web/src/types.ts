@@ -60,4 +60,5 @@ export type GlobalIQAnswer = {
   confidence: string;
   citations: Array<{ domain: string; id: string }>;
   evidence_complete: boolean;
+  agent?: string | null;
 };

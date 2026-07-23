@@ -169,6 +169,7 @@ function GlobalIQ() {
             <div className="citation-row">
               {query.data.citations.map((citation) => <span key={`${citation.domain}-${citation.id}`}>{citation.domain} / {citation.id}</span>)}
               <b>{Math.round(Number(query.data.confidence) * 100)}% confidence</b>
+              {query.data.agent && <span className="iq-agent-tag">{titleCase(query.data.agent.replace(/-/g, " "))}</span>}
             </div>
           </div>
         </div>
