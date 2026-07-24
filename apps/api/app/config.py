@@ -49,6 +49,11 @@ class Settings:
         if self.seed_demo_data and self.environment != "production" and len(self.demo_password) < 12:
             raise RuntimeError("DEMO_PASSWORD must contain at least 12 characters when demo data is enabled.")
         if self.environment == "production":
+            if self.app_storage != "mongo":
+                raise RuntimeError(
+                    "APP_STORAGE must be mongo in production; refusing to start with "
+                    "in-memory or ephemeral file storage that data would not survive a deploy."
+                )
             if not self.auth_secret_configured or len(self.auth_secret) < 32:
                 raise RuntimeError("Production AUTH_SECRET must contain at least 32 characters.")
             if not self.bootstrap_admin_password:
