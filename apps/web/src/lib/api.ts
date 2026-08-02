@@ -48,6 +48,14 @@ export const api = {
   async me() {
     return (await request<UserSession>("/auth/me")).data;
   },
+  async demoLogin() {
+    const response = await request<{ user: UserSession; access_token: string }>("/auth/demo", { method: "POST" });
+    setAccessToken(response.data.access_token);
+    return response.data.user;
+  },
+  async health() {
+    return (await request<{ demo_login_available: boolean }>("/health")).data;
+  },
   async list<T extends UniversalRecord>(domain: string, limit = 100) {
     return request<T[]>(`/${domain}?limit=${limit}`);
   },

@@ -78,6 +78,8 @@ function Login({ onLogin }: { onLogin: (session: UserSession) => void }) {
   const [email, setEmail] = useState("owner@bcaz.example");
   const [password, setPassword] = useState("");
   const login = useMutation({ mutationFn: () => api.login(email, password), onSuccess: onLogin });
+  const demoLogin = useMutation({ mutationFn: () => api.demoLogin(), onSuccess: onLogin });
+  const health = useQuery({ queryKey: ["health"], queryFn: api.health, retry: false });
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -114,6 +116,17 @@ function Login({ onLogin }: { onLogin: (session: UserSession) => void }) {
             {login.isPending ? "Checking credentials…" : "Enter B.O.H IQ"}<ArrowRight size={18} />
           </button>
         </form>
+        {health.data?.demo_login_available && (
+          <button
+            className="button button--quiet"
+            type="button"
+            disabled={demoLogin.isPending}
+            onClick={() => demoLogin.mutate()}
+          >
+            {demoLogin.isPending ? "Skipping…" : "Skip Login (Demo Mode)"}
+          </button>
+        )}
+        {demoLogin.isError && <div className="form-error" role="alert"><AlertTriangle size={17} /> {demoLogin.error.message}</div>}
         <p className="login-card__foot">Authorized operators only. Actions are logged to the operational audit trail.</p>
       </section>
     </main>
