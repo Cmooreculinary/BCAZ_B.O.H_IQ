@@ -183,7 +183,14 @@ async def get_accessible(domain: str, record_id: str, user: dict[str, Any]) -> d
 
 @app.get("/api/v1/health")
 async def health(request: Request):
-    return envelope({"status": "healthy", "service": "bcaz-boh-iq-api"}, request)
+    return envelope(
+        {
+            "status": "healthy",
+            "service": "bcaz-boh-iq-api",
+            "demo_login_available": settings.seed_demo_data and settings.environment != "production"
+        },
+        request
+    )
 
 
 @app.get("/api/v1/readiness")
@@ -201,6 +208,17 @@ async def login(payload: LoginRequest, request: Request):
     user = await repository.find_one("users", {"email": payload.email.strip().lower()})
     if not user or not verify_password(payload.password, user.get("password_hash", "")):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Email or password is incorrect.")
+    token = create_access_token(user["id"], user["organization_id"])
+    return envelope({"access_token": token, "token_type": "bearer", "user": public_session(user)}, request)
+
+
+@app.post("/api/v1/auth/demo")
+async def demo_login(request: Request):
+    if not settings.seed_demo_data or settings.environment == "production":
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found.")
+    user = await repository.find_one("users", {"email": settings.bootstrap_admin_email})
+    if not user:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Demo user is not available.")
     token = create_access_token(user["id"], user["organization_id"])
     return envelope({"access_token": token, "token_type": "bearer", "user": public_session(user)}, request)
 
